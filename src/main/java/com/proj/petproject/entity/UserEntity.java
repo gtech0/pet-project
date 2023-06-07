@@ -10,7 +10,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -29,24 +28,15 @@ public class UserEntity implements UserDetails {
     @Column
     private String login;
 
-    @Column
-    private String email;
+    @Column(name = "full_name")
+    private String fullName;
 
     @Column
     private String password;
 
-    @Column(columnDefinition = "TEXT")
-    private String signature;
-
     @Enumerated(EnumType.STRING)
     @Column
     private RoleEnum role;
-
-    @Column(name = "number_of_edits")
-    private Integer numberOfEdits;
-
-    @Column(name = "registration_time")
-    private Date registrationTime;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
