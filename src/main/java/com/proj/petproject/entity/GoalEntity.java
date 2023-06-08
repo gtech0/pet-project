@@ -1,13 +1,11 @@
 package com.proj.petproject.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Date;
 import java.util.UUID;
 
 @Entity
@@ -27,13 +25,18 @@ public class GoalEntity {
     @Column
     private String description;
 
+    @Temporal(TemporalType.TIME)
     @Column(name = "expected_time")
-    private Integer expectedTime;
+    private Date expectedTime;
 
     @Column
     private boolean completed;
 
+    @Enumerated(EnumType.STRING)
+    @Column
+    private PriorityEnum priority;
+
     @Column(name = "creation_time")
-    private boolean creationTime;
+    private Date creationTime;
 
 }

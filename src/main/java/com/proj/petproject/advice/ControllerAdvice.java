@@ -10,10 +10,11 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.text.ParseException;
 import java.util.Date;
 
 @RestControllerAdvice
-public class UserAdvice {
+public class ControllerAdvice {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex) {
@@ -35,6 +36,12 @@ public class UserAdvice {
     public ResponseEntity<Object> handleUserNotFoundException(UserNotFoundException ex) {
         ErrorResponse errorResponse = new ErrorResponse(new Date(), HttpStatus.NOT_FOUND.value(), ex.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+    }
+
+    @ExceptionHandler(ParseException.class)
+    public ResponseEntity<Object> handleParseException(ParseException ex) {
+        ErrorResponse errorResponse = new ErrorResponse(new Date(), HttpStatus.BAD_REQUEST.value(), ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 
 }

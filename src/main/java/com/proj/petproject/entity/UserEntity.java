@@ -25,18 +25,21 @@ public class UserEntity implements UserDetails {
     @Column
     private UUID id;
 
-    @Column
+    @Column(nullable = false)
     private String login;
 
-    @Column(name = "full_name")
+    @Column(name = "full_name", nullable = false)
     private String fullName;
 
-    @Column
+    @Column(nullable = false)
     private String password;
 
     @Enumerated(EnumType.STRING)
     @Column
     private RoleEnum role;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PersonalTaskEntity> tasks;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

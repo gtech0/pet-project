@@ -1,39 +1,45 @@
 package com.proj.petproject.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Date;
 import java.util.UUID;
 
 @Entity
 @Table(name = "task")
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class PersonalTask {
+public class PersonalTaskEntity {
 
     @Id
     @Column
     private UUID id;
 
-    @Column
+    @Column(nullable = false)
     private String name;
 
     @Column
     private String description;
 
+    @Temporal(TemporalType.DATE)
     @Column(name = "start_time")
-    private Integer startTime;
+    private Date startTime;
 
+    @Temporal(TemporalType.DATE)
     @Column(name = "end_time")
-    private Integer endTime;
+    private Date endTime;
 
     @Column
     private boolean completed;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private UserEntity user;
 
 }
