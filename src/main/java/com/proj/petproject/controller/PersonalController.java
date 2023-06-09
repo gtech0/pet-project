@@ -1,8 +1,6 @@
 package com.proj.petproject.controller;
 
-import com.proj.petproject.dto.CreatePersonalTaskDto;
-import com.proj.petproject.dto.GetPersonalTaskDto;
-import com.proj.petproject.dto.StringDto;
+import com.proj.petproject.dto.*;
 import com.proj.petproject.service.PersonalService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +24,13 @@ public class PersonalController {
         return personalService.addTask(dto, authentication.getName());
     }
 
+    @PutMapping("/update/task/{id}")
+    public ResponseEntity<StringDto> updateTask(@RequestBody ChangePersonalTaskDto dto,
+                                                @PathVariable UUID id,
+                                                Authentication authentication) {
+        return personalService.updateTask(dto, id, authentication.getName());
+    }
+
     @DeleteMapping("/delete/task/{id}")
     public ResponseEntity<StringDto> deleteTask(@PathVariable UUID id,
                                              Authentication authentication) {
@@ -38,4 +43,22 @@ public class PersonalController {
         return personalService.taskCalendar(date, authentication.getName());
     }
 
+    @PostMapping("/new/goal")
+    public ResponseEntity<StringDto> addGoal(@RequestBody CreateGoalDto dto,
+                                                            Authentication authentication) {
+        return personalService.addGoal(dto, authentication.getName());
+    }
+
+    @PutMapping("/update/goal/{id}")
+    public ResponseEntity<StringDto> updateGoal(@RequestBody ChangeGoalDto dto,
+                                                @PathVariable UUID id,
+                                                Authentication authentication) {
+        return personalService.updateGoal(dto, id, authentication.getName());
+    }
+
+    @DeleteMapping("/delete/goal/{id}")
+    public ResponseEntity<StringDto> deleteGoal(@PathVariable UUID id,
+                                             Authentication authentication) {
+        return personalService.deleteGoal(id, authentication.getName());
+    }
 }

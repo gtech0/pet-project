@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -22,5 +23,5 @@ public interface PersonalTaskRepository extends JpaRepository<PersonalTaskEntity
             "OR cast(:time as date) IS NULL) " +
             "ORDER BY p.startTime")
     List<GetPersonalTaskDto> getAllByStartTimeOrEndTimeQuery(Date time, UserEntity user);
-    boolean findByIdAndUser(UUID id, UserEntity user);
+    Optional<PersonalTaskEntity> findByIdAndUser(UUID id, UserEntity user);
 }

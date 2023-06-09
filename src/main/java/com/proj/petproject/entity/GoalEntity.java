@@ -2,6 +2,7 @@ package com.proj.petproject.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -11,6 +12,7 @@ import java.util.UUID;
 @Entity
 @Table(name = "goal")
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class GoalEntity {
@@ -29,14 +31,22 @@ public class GoalEntity {
     @Column(name = "expected_time")
     private Date expectedTime;
 
-    @Column
-    private boolean completed;
-
     @Enumerated(EnumType.STRING)
     @Column
     private PriorityEnum priority;
 
+    @Column
+    private boolean completed;
+
     @Column(name = "creation_time")
     private Date creationTime;
+
+    @ManyToOne
+    @JoinColumn(name = "task_id")
+    private PersonalTaskEntity task;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private UserEntity user;
 
 }

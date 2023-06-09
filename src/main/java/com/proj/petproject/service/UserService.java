@@ -5,7 +5,7 @@ import com.proj.petproject.dto.*;
 import com.proj.petproject.entity.RoleEnum;
 import com.proj.petproject.entity.UserEntity;
 import com.proj.petproject.exception.UniqueConstraintViolationException;
-import com.proj.petproject.exception.UserNotFoundException;
+import com.proj.petproject.exception.NotFoundException;
 import com.proj.petproject.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -52,7 +52,7 @@ public class UserService {
     public ResponseEntity<JwtTokenDto> authorization(AuthDataDto dto) {
         if (userRepository.findByLogin(dto.getLogin()).isEmpty()) {
             log.debug("User " + dto.getLogin() + " doesn't exist");
-            throw new UserNotFoundException("User " + dto.getLogin() + " doesn't exist");
+            throw new NotFoundException("User " + dto.getLogin() + " doesn't exist");
         }
 
         authenticationManager.authenticate(
@@ -70,7 +70,7 @@ public class UserService {
         Optional<UserEntity> user = userRepository.findByLogin(login);
         if (user.isEmpty()) {
             log.info("User doesn't exist");
-            throw new UserNotFoundException("User doesn't exist");
+            throw new NotFoundException("User doesn't exist");
         }
 
         return ResponseEntity.ok(new UserInfoDto(
@@ -88,7 +88,7 @@ public class UserService {
         Optional<UserEntity> user = userRepository.findByLogin(login);
         if (user.isEmpty()) {
             log.info("User doesn't exist");
-            throw new UserNotFoundException("User doesn't exist");
+            throw new NotFoundException("User doesn't exist");
         }
 
         user.get().setFullName(dto.getFullName());
@@ -102,7 +102,7 @@ public class UserService {
         Optional<UserEntity> user = userRepository.findByLogin(login);
         if (user.isEmpty()) {
             log.info("User doesn't exist");
-            throw new UserNotFoundException("User doesn't exist");
+            throw new NotFoundException("User doesn't exist");
         }
         userRepository.deleteByLogin(login);
 

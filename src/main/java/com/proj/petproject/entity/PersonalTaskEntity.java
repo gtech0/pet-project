@@ -7,10 +7,11 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Table(name = "task")
+@Table(name = "personal_task")
 @Data
 @Builder
 @NoArgsConstructor
@@ -41,5 +42,8 @@ public class PersonalTaskEntity {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private UserEntity user;
+
+    @OneToMany(mappedBy = "task", cascade = CascadeType.ALL)
+    private List<GoalEntity> goals;
 
 }
