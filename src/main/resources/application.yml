@@ -1,7 +1,4 @@
 spring:
-  jpa:
-    hibernate:
-      ddl-auto: create-drop
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5432/pet_proj_db
@@ -12,6 +9,9 @@ spring:
     user: postgres
     password: password
     locations: classpath:migrations
+  jpa:
+    hibernate:
+      ddl-auto: validate
 application:
   security:
     jwt:

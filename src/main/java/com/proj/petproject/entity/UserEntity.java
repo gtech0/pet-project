@@ -38,10 +38,10 @@ public class UserEntity implements UserDetails {
     @Column
     private RoleEnum role;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<PersonalTaskEntity> tasks;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<GoalEntity> goals;
 
     @Override

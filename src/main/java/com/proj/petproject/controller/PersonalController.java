@@ -18,22 +18,28 @@ public class PersonalController {
 
     private final PersonalService personalService;
 
-    @PostMapping("/new/task")
+    @PostMapping("/task/new")
     public ResponseEntity<StringDto> addTask(@RequestBody CreatePersonalTaskDto dto,
                                              Authentication authentication) {
         return personalService.addTask(dto, authentication.getName());
     }
 
-    @PutMapping("/update/task/{id}")
+    @PostMapping("/task/complete/{id}")
+    public ResponseEntity<StringDto> completeTask(@PathVariable UUID id,
+                                                  Authentication authentication) {
+        return personalService.completeTask(id, authentication.getName());
+    }
+
+    @PutMapping("/task/update/{id}")
     public ResponseEntity<StringDto> updateTask(@RequestBody ChangePersonalTaskDto dto,
                                                 @PathVariable UUID id,
                                                 Authentication authentication) {
         return personalService.updateTask(dto, id, authentication.getName());
     }
 
-    @DeleteMapping("/delete/task/{id}")
+    @DeleteMapping("/task/delete/{id}")
     public ResponseEntity<StringDto> deleteTask(@PathVariable UUID id,
-                                             Authentication authentication) {
+                                                Authentication authentication) {
         return personalService.deleteTask(id, authentication.getName());
     }
 
@@ -43,22 +49,38 @@ public class PersonalController {
         return personalService.taskCalendar(date, authentication.getName());
     }
 
-    @PostMapping("/new/goal")
+    @PostMapping("/goal/new")
     public ResponseEntity<StringDto> addGoal(@RequestBody CreateGoalDto dto,
-                                                            Authentication authentication) {
+                                             Authentication authentication) {
         return personalService.addGoal(dto, authentication.getName());
     }
 
-    @PutMapping("/update/goal/{id}")
+    @PostMapping("/goal/complete/{id}")
+    public ResponseEntity<StringDto> completeGoal(@PathVariable UUID id,
+                                                  Authentication authentication) {
+        return personalService.completeGoal(id, authentication.getName());
+    }
+
+    @GetMapping("/goals")
+    public ResponseEntity<List<GetGoalsDto>> getCurrentGoals(Authentication authentication) {
+        return personalService.getCurrentGoals(authentication.getName());
+    }
+
+    @GetMapping("/goals/completed")
+    public ResponseEntity<List<GetGoalsDto>> getCompletedGoals(Authentication authentication) {
+        return personalService.getCompletedGoals(authentication.getName());
+    }
+
+    @PutMapping("/goal/update/{id}")
     public ResponseEntity<StringDto> updateGoal(@RequestBody ChangeGoalDto dto,
                                                 @PathVariable UUID id,
                                                 Authentication authentication) {
         return personalService.updateGoal(dto, id, authentication.getName());
     }
 
-    @DeleteMapping("/delete/goal/{id}")
+    @DeleteMapping("/goal/delete/{id}")
     public ResponseEntity<StringDto> deleteGoal(@PathVariable UUID id,
-                                             Authentication authentication) {
+                                                Authentication authentication) {
         return personalService.deleteGoal(id, authentication.getName());
     }
 }

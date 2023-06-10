@@ -27,20 +27,11 @@ public class PersonalService {
     private final GoalRepository goalRepository;
     private final UserRepository userRepository;
 
-    private Optional<UserEntity> getUserEntity(String login) {
-        Optional<UserEntity> user = userRepository.findByLogin(login);
-        if (user.isEmpty()) {
-            log.error("User doesn't exist");
-            throw new NotFoundException("User doesn't exist");
-        }
-        return user;
-    }
-
-    private PersonalTaskEntity getPersonalTask(UUID dto, Optional<UserEntity> user) {
+    private PersonalTaskEntity getPersonalTask(UUID id, UserEntity user) {
         PersonalTaskEntity task = null;
-        if (dto != null) {
+        if (id != null) {
             Optional<PersonalTaskEntity> optionalTask = personalTaskRepository
-                    .findByIdAndUser(dto, user.get());
+                    .findByIdAndUser(id, user);
 
             if (optionalTask.isEmpty()) {
                 log.error("Task doesn't exist");
@@ -54,7 +45,9 @@ public class PersonalService {
 
     @Transactional
     public ResponseEntity<StringDto> addTask(CreatePersonalTaskDto dto, String login) {
-        Optional<UserEntity> user = getUserEntity(login);
+        UserEntity user = userRepository
+                .findByLogin(login)
+                .orElseThrow(() -> new NotFoundException("Task doesn't exist"));
 
         PersonalTaskEntity task = PersonalTaskEntity.builder()
                 .id(UUID.randomUUID())
@@ -63,7 +56,7 @@ public class PersonalService {
                 .startTime(dto.getStartTime())
                 .endTime(dto.getEndTime())
                 .completed(false)
-                .user(user.get())
+                .user(user)
                 .build();
         personalTaskRepository.save(task);
 
@@ -71,10 +64,26 @@ public class PersonalService {
     }
 
     @Transactional
-    public ResponseEntity<StringDto> updateTask(ChangePersonalTaskDto dto, UUID id, String login) {
-        Optional<UserEntity> user = getUserEntity(login);
+    public ResponseEntity<StringDto> completeTask(UUID id, String login) {
+        UserEntity user = userRepository
+                .findByLogin(login)
+                .orElseThrow(() -> new NotFoundException("User doesn't exist"));
 
-        Optional<PersonalTaskEntity> task = personalTaskRepository.findByIdAndUser(id, user.get());
+        PersonalTaskEntity task = personalTaskRepository
+                .findByIdAndUser(id, user)
+                .orElseThrow(() -> new NotFoundException("Task doesn't exist"));
+
+        task.setCompleted(true);
+        return ResponseEntity.ok(new StringDto("Task completed"));
+    }
+
+    @Transactional
+    public ResponseEntity<StringDto> updateTask(ChangePersonalTaskDto dto, UUID id, String login) {
+        UserEntity user = userRepository
+                .findByLogin(login)
+                .orElseThrow(() -> new NotFoundException("Task doesn't exist"));
+
+        Optional<PersonalTaskEntity> task = personalTaskRepository.findByIdAndUser(id, user);
         if (task.isEmpty()) {
             log.error("Task doesn't exist");
             throw new NotFoundException("Task doesn't exist");
@@ -92,9 +101,11 @@ public class PersonalService {
 
     @Transactional
     public ResponseEntity<StringDto> deleteTask(UUID id, String login) {
-        Optional<UserEntity> user = getUserEntity(login);
+        UserEntity user = userRepository
+                .findByLogin(login)
+                .orElseThrow(() -> new NotFoundException("Task doesn't exist"));
 
-        if (personalTaskRepository.findByIdAndUser(id, user.get()).isEmpty()) {
+        if (personalTaskRepository.findByIdAndUser(id, user).isEmpty()) {
             log.error("Task doesn't exist");
             throw new NotFoundException("Task doesn't exist");
         }
@@ -104,14 +115,16 @@ public class PersonalService {
     }
 
     public ResponseEntity<List<GetPersonalTaskDto>> taskCalendar(String date, String login) throws ParseException {
-        Optional<UserEntity> user = getUserEntity(login);
+        UserEntity user = userRepository
+                .findByLogin(login)
+                .orElseThrow(() -> new NotFoundException("Task doesn't exist"));
 
         List<GetPersonalTaskDto> tasks;
         if (date != null) {
             SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
-            tasks = personalTaskRepository.getAllByStartTimeOrEndTimeQuery(formatter.parse(date), user.get());
+            tasks = personalTaskRepository.getAllByStartTimeOrEndTimeQuery(formatter.parse(date), user);
         } else {
-            tasks = personalTaskRepository.getAllByStartTimeOrEndTimeQuery(null, user.get());
+            tasks = personalTaskRepository.getAllByStartTimeOrEndTimeQuery(null, user);
         }
 
         return ResponseEntity.ok(tasks);
@@ -119,7 +132,9 @@ public class PersonalService {
 
     @Transactional
     public ResponseEntity<StringDto> addGoal(CreateGoalDto dto, String login) {
-        Optional<UserEntity> user = getUserEntity(login);
+        UserEntity user = userRepository
+                .findByLogin(login)
+                .orElseThrow(() -> new NotFoundException("Task doesn't exist"));
 
         PersonalTaskEntity task = getPersonalTask(dto.getTask(), user);
 
@@ -132,7 +147,7 @@ public class PersonalService {
                 .priority(dto.getPriority())
                 .creationTime(new Date())
                 .task(task)
-                .user(user.get())
+                .user(user)
                 .build();
         goalRepository.save(goal);
 
@@ -140,35 +155,71 @@ public class PersonalService {
     }
 
     @Transactional
+    public ResponseEntity<StringDto> completeGoal(UUID id, String login) {
+        UserEntity user = userRepository
+                .findByLogin(login)
+                .orElseThrow(() -> new NotFoundException("User doesn't exist"));
+
+        GoalEntity goal = goalRepository
+                .findByIdAndUser(id, user)
+                .orElseThrow(() -> new NotFoundException("Goal doesn't exist"));
+
+        goal.setCompleted(true);
+        return ResponseEntity.ok(new StringDto("Goal completed"));
+    }
+
+    public ResponseEntity<List<GetGoalsDto>> getCurrentGoals(String login) {
+        UserEntity user = userRepository
+                .findByLogin(login)
+                .orElseThrow(() -> new NotFoundException("User doesn't exist"));
+
+        List<GetGoalsDto> goals = goalRepository.findAllOrderByCreationTimeQuery(user.getId());
+
+        return ResponseEntity.ok(goals);
+    }
+
+    public ResponseEntity<List<GetGoalsDto>> getCompletedGoals(String login) {
+        UserEntity user = userRepository
+                .findByLogin(login)
+                .orElseThrow(() -> new NotFoundException("User doesn't exist"));
+
+        List<GetGoalsDto> goals = goalRepository.findAllCompletedOrderByCreationTimeQuery(user.getId());
+
+        return ResponseEntity.ok(goals);
+    }
+
+    @Transactional
     public ResponseEntity<StringDto> updateGoal(ChangeGoalDto dto, UUID id, String login) {
-        Optional<UserEntity> user = getUserEntity(login);
+        UserEntity user = userRepository
+                .findByLogin(login)
+                .orElseThrow(() -> new NotFoundException("User doesn't exist"));
 
         PersonalTaskEntity task = getPersonalTask(dto.getTask(), user);
 
-        Optional<GoalEntity> goal = goalRepository.findByIdAndTaskAndUser(id, task, user.get());
-        if (goal.isEmpty()) {
-            log.error("Goal doesn't exist");
-            throw new NotFoundException("Goal doesn't exist");
-        }
+        GoalEntity goal = goalRepository
+                .findByIdAndTaskAndUser(id, task, user)
+                .orElseThrow(() -> new NotFoundException("Goal doesn't exist"));
 
-        goal.get().setName(dto.getName());
-        goal.get().setDescription(dto.getDescription());
-        goal.get().setExpectedTime(dto.getExpectedTime());
-        goal.get().setCompleted(dto.isCompleted());
-        goal.get().setTask(task);
-        goalRepository.save(goal.get());
+        goal.setName(dto.getName());
+        goal.setDescription(dto.getDescription());
+        goal.setExpectedTime(dto.getExpectedTime());
+        goal.setCompleted(dto.isCompleted());
+        goal.setTask(task);
+        goalRepository.save(goal);
 
         return ResponseEntity.ok(new StringDto("Goal updated"));
     }
 
     @Transactional
     public ResponseEntity<StringDto> deleteGoal(UUID id, String login) {
-        Optional<UserEntity> user = getUserEntity(login);
+        UserEntity user = userRepository
+                .findByLogin(login)
+                .orElseThrow(() -> new NotFoundException("User doesn't exist"));
 
-        if (goalRepository.findByIdAndUser(id, user.get()).isEmpty()) {
-            log.error("Goal doesn't exist");
-            throw new NotFoundException("Goal doesn't exist");
-        }
+        goalRepository
+                .findByIdAndUser(id, user)
+                .orElseThrow(() -> new NotFoundException("Goal doesn't exist"));
+
         goalRepository.deleteById(id);
 
         return ResponseEntity.ok(new StringDto("Goal deleted"));
